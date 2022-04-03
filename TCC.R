@@ -1,4 +1,4 @@
-#TCC
+#Undergraduate thesis - Data wrangling and statitical aproach
 
 library(readxl)
 library(plyr)
@@ -214,10 +214,10 @@ library(ggplot2)
 # Analize first wave of coronavirus in Brazil (why the choice of the time series)
 
 ggplot(data_gov, aes(date, Newcases)) + geom_line() + labs(x= "Data" , y ="Casos Diarios", 
-                                                            title = "Casos di·rios de Covid-19")
+                                                            title = "Casos di√°rios de Covid-19")
 
 ggplot(data_gov, aes(date, Newdeaths)) + geom_line() + labs(x= "Data" , y ="Mortes Diarias", 
-        title = "Mortes di·rias por Covid-19") 
+        title = "Mortes di√°rias por Covid-19") 
 
 #+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
