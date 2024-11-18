@@ -11,7 +11,7 @@ library(naniar)
 library(Hmisc)
 library(fastDummies)
       
-##Import data from https://covid.saude.gov.br/, previously dowloaded and treated in excel.
+##Import data from https://covid.saude.gov.br/, which was previously downloaded and treated in Excel.
       
 data_gov <- read_excel("C:\\Users\\Dell\\Downloads\\HIST_PAINEL_COVIDBR_2020.xlsx")
 
@@ -38,7 +38,7 @@ str(data_gov)
 
 
 
-####import data from companies (previously dowloaded from economatica), change column names and missing values
+####import data from companies (previously downloaded from Economatica), change column names and missing values
 
 
                                                                       
@@ -69,7 +69,7 @@ data_economatica$Code <- sub("<XBSP>", "", data_economatica$Code)
 
 data_economatica$Code <- as.factor(data_economatica$Code)
 
-## create new column with an id for each company
+## Create new column with an id for each company
 
 data_economatica  <- transform(data_economatica,                                 
                    ID = as.numeric(factor(Code)))
@@ -82,11 +82,11 @@ data_economatica$date <- as.Date(data_economatica$date)
 
 data_economatica$LMCAP = log(data_economatica$MCAP)
 
-# puting DR in percentual
+# putting DR in percentual
 
 data_economatica$DR <- data_economatica$DR/100
 
-#Import data from companies (previously dowloaded from economatica)
+#Import data from companies (previously downloaded from Economatica)
 
 
 
@@ -113,7 +113,7 @@ str(data_company)
 
 view(data_company)
 
-#Select data to show only ID, date, return of stock, log daily market Capitalization, Market-to-Book ratio and subsector,
+#Select data to show only ID, date, return of the stock, log daily market Capitalization, Market-to-Book ratio and subsector,
 #and filter date to show only weekdays.
 
 data_company %>%  select(ID, date, DR, LMCAP, MTB, Subsector_B3) %>% 
@@ -132,7 +132,7 @@ str(Data)
 
 view(Data)
 
-# Drop uninportant columns
+# Drop unimportant columns
 
 Data <- Data[-c(7:9,11,12,14)]
 
@@ -147,13 +147,13 @@ Data <- Data[, c(2,1,6,3,4,5,7,8)]
 view(Data)
 
 
-## drop missing values (select only companies with available data for the period)
+## Drop missing values (select only companies with available data for the period)
 
 
 Data %>% drop_na(LMCAP, MTB) -> Data
 
 
-## drop missing values from holidays
+## Drop missing values from holidays
 #26/02, 10/04, 21/04, 01/05, 11/06, 07/09, 12/10 -> 7 observations, include the first one.
 
 Data %>% na.omit(DR) -> Data
@@ -165,7 +165,7 @@ view(Data)
 
 
 
-### Examine final data set
+### Examine the final data set
 
 str(Data)
 head(Data)
@@ -191,19 +191,16 @@ summary(Data1)
 library(psych)
 describe(Data1)  #mean, median, SD, max, min, Skeweness, Kurtosis
 
-
-
 #write.csv(Data, "C:\\Users\\Dell\\Downloads\\TCC.csv")
 
-
-#Unobserverd Heterogeineity 
+#Unobserverd Heterogeneity 
 
 library(gplots)
 
 plotmeans(DR ~ ID, main = "Heterogeineity across companies", data = Data)  #There is no heterogeneity across companies
 
-plotmeans(DR ~ date, main = "Heterogeineity across time", data = Data)  # There is heterogeneity across time
-# we will use other test to verify heterogeneity
+plotmeans(DR ~ date, main = "Heterogeneity across time", data = Data)  # There is heterogeneity across time
+# We will use another test to verify heterogeneity
 
 ################### Data is ready for estimation #############
 
@@ -211,7 +208,7 @@ library(ggplot2)
 
 
 
-# Analize first wave of coronavirus in Brazil (why the choice of the time series)
+# Analize the first wave of coronavirus in Brazil (why the choice of the time series)
 
 ggplot(data_gov, aes(date, Newcases)) + geom_line() + labs(x= "Data" , y ="Casos Diarios", 
                                                             title = "Casos diários de Covid-19")
@@ -265,7 +262,7 @@ phtest(fixed, random )   #p-value < 0.05, the fixed effects model is a better ch
 
 
 
-#test for cross section dependence
+#test for cross-section dependence
 pcdtest(fixed, test = c("lm"))
 pcdtest(fixed, test = c("cd"))  ### in both tests, p-value < 0.05, there is cross-sectional dependence
 
@@ -283,15 +280,15 @@ library(lmtest)
 bptest(DR ~ lag(LMCAP, k=-1) + lag(MTB, k=-1) + lag(DGTCC,k=-1) , data = pdata, studentize=F) ##p-value < 0.05, presence of heteroskedasticity
 
 
-#To deal with autocorrelation, hetroskedasticity and cross sectional dependence in my data i will
+#To deal with autocorrelation, heteroskedasticity, and cross-sectional dependence in my data I will
 #use Panel Corrected Standard Error (PCSE) regression, since in my data N>T.
 
-#counting number of data available for each company
+#counting the number of data available for each company
 
 Data %>% count(ID, sort = TRUE) ### 210 companies with 163 observations 
 
 # Dealing with unbalanced Data  = drop companies with less than 163 ID observations.
-# Extract largest balanced subset of the data.
+# Extract the largest balanced subset of the data.
 
 Data %>% group_by(ID) %>%
   filter(n() >= 2) %>% 
@@ -316,7 +313,7 @@ gc()
 
 
 
-########## Panel data analysis for Daily Growth in total covid death Cases
+########## Panel data analysis for Daily Growth in total COVID Death Cases
 
 attach(Data)
 Y <- cbind(DR)
@@ -330,8 +327,6 @@ view(pdata)
 
 
 # Descriptive statistics
-
-
 
 # Pooled Ordinary Least Square estimator
 
@@ -364,7 +359,7 @@ phtest(fixed, random )   #p-value < 0.05, the fixed effects model is a better ch
 
 
 
-#test for cross section dependence
+#test for cross-section dependence
 pcdtest(fixed, test = c("lm"))
 pcdtest(fixed, test = c("cd"))  ### in both tests, p-value < 0.05, there is cross-sectional dependence
 
@@ -383,8 +378,11 @@ bptest(DR ~ lag(LMCAP, k=-1) + lag(MTB, k=-1) + lag(DGTCC,k=-1) , data = pdata, 
 
 
 
-#
-rm(list = ls())
+#rm(list = ls())
+
+
+
+
 
 
 
